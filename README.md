@@ -1,15 +1,14 @@
 # line-follower-simulator
 Design of a simple line follower robot simulator in Python.
 
+![robot_positioning_v2](https://github.com/yanvgf/line-follower-simulator/assets/93750334/a583e610-0dc0-4072-b5b2-2bd48890b2c3)
+
 **This project is still under development. Some of the features yet to be implemented are:**
 
 - [ ] Full translation to English
 - [ ] A more realistic kinematic model of the robot
 - [ ] Free adding and removing of sensors (currently, the number of sensors is fixed)
 - [ ] Saving and loading of robots configured before by the user
-
-
-![robot_positioning_v1](https://github.com/yanvgf/WiSARD-line-follower/assets/93750334/5c36be7d-846e-4440-9fa9-3fee133d65b7)
 
 ## Requirements
 
