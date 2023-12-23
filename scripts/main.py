@@ -14,7 +14,7 @@ MAP_DIMENSIONS = (1300, 660) # 1360x768
 gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
     
 # Inicializa o robô
-ROBOT_START = gfx.robot_positioning()
+ROBOT_START, closed = gfx.robot_positioning()
 ROBOT_WIDTH = 0.1
 INITIAL_MOTOR_SPEED = 10000
 MAX_MOTOR_SPEED = 20000
@@ -26,17 +26,10 @@ robot = Robot(initial_position=ROBOT_START,
               wheel_radius=WHEEL_RADIUS)
 
 # Inicializa sensores
-# TODO: permitir ao usuário posicionar os sensores
 # TODO: salvar as configurações de posição dos sensores e do robô em um arquivo separado
 #       pro usuário não ter que mexer toda hora que for rodar
-SENSORS_POSITIONS = [(40, -45),
-                    (40, -20),
-                    (40, 0),
-                    (40, 20),
-                    (40, 45)]
+SENSORS_POSITIONS, closed = gfx.sensors_positioning(ROBOT_START, closed)
 sensors = [Sensor(position, ROBOT_START) for position in SENSORS_POSITIONS]
-
-
 
 # +=====================================================================+
 # |                            Simulação                                |
@@ -48,7 +41,7 @@ I = 0 # PID integral
 
 running = True
 
-while running:
+while running and not(closed):
     
     # Verifica se o usuário fechou a janela
     for event in pygame.event.get():
@@ -81,7 +74,7 @@ while running:
 # |                         Control logic                               |
 # |                                                                     |
     # Calcula o erro e escreve na tela
-    error = sensors[1].data - sensors[3].data
+    error = sensors[3].data - sensors[1].data
     gfx.show_text(text=f"Error: "+ str(error),
                   position=(10, 10 + 130))
     

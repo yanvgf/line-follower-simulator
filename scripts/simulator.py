@@ -149,8 +149,8 @@ class Sensor:
         
         # Adiciona o vetor de posição relativa à posição do robô pra obter a posição real do sensor
         self.x = robot_position[0] + sensor_position_rotated[0] 
-        self.y = robot_position[1] - sensor_position_rotated[1] # Subtrai pois o eixo y aumenta pra baixo
-        
+        self.y = robot_position[1] - sensor_position_rotated[1] # Subtrai pois o eixo y aumenta pra baixo        
+    
     def read_data(self, map_image):
         """Lê os dados do sensor. O sensor retorna 1 se lê uma cor escuta e 0 se lê uma cor clara.
         
@@ -196,15 +196,14 @@ class Graphics:
     
     def robot_positioning(self):
         """Positions the robot according to the user's mouse click.
-        
-        Args:
-            gfx (Graphics): Graphics object.
             
         Returns:
             tuple: robot initial position (x, y, heading).
+            bool: True if the user closed the window, False otherwise.
         """
 
         running = True
+        closed = False
         robot_start_heading = np.pi/2
         xy_positioned = False
         heading_positioned = False
@@ -221,6 +220,7 @@ class Graphics:
                 # Verifica se o usuário fechou a janela
                 if event.type == pygame.QUIT: 
                     running = False
+                    closed = True
                 
                 # Left click: posicionamento (x,y)
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: 
@@ -269,7 +269,75 @@ class Graphics:
             # Atualiza a tela
             pygame.display.update()
             
-        return robot_start_x, robot_start_y, robot_start_heading
+        return (robot_start_x, robot_start_y, robot_start_heading), closed
+    
+    def sensors_positioning(self, robot_start, closed):
+        """Positions the sensors according to the user's mouse click.
+        
+        Args:
+            robot_start (tuple): robot initial position (x, y, heading).
+            closed (bool): True if the user closed the last window, False otherwise.
+        
+        Returns:
+            list: list of sensors relative positions (x, y).
+            bool: True if the user closed the window, False otherwise.
+        """
+        
+        running = True
+        sensors_positions = []
+        sensors_relative_positions = []
+        counter = 0
+        
+        while counter < 5 and running and not(closed):
+            
+            for event in pygame.event.get():
+                
+                # Verifica se o usuário fechou a janela
+                if event.type == pygame.QUIT: 
+                    running = False
+                    closed = True
+                
+                # Left click: posicionamento (x,y)
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: 
+                    
+                    # Posição absoluta dos sensores
+                    sensor_x, sensor_y = pygame.mouse.get_pos()
+                    sensors_positions.append((sensor_x, sensor_y))
+                    
+                    # Posição dos sensores em relação ao robô (considerando o seu ângulo)
+                    sensor_relative_x = sensor_x - robot_start[0]
+                    sensor_relative_y = robot_start[1] - sensor_y # Subtrai pois o eixo y aumenta pra baixo
+                    sensor_relative = utils.rotate_vector((sensor_relative_x, sensor_relative_y), -robot_start[2])
+                    sensors_relative_positions.append(sensor_relative)
+                    
+                    counter += 1
+            
+            # Desenha mapa
+            self.map.blit(self.map_image, (0, 0))
+            
+            # Desenha o robô na posição inicial
+            self.draw_robot(robot_start[0], robot_start[1], robot_start[2])
+            
+            # Escreve na tela a mensagem de posicionamento dos sensores
+            self.show_text(text="Position the sensors:",
+                        position=(20, 100), fontsize=25)
+            self.show_text(text="Left click to position each sensor.",
+                        position=(40, 150), fontsize=20)
+            self.show_text(text=f"Positioned: {counter}/5",
+                        position=(20, 190), fontsize=25)
+        
+            # Desenha na posição desejada os sensores já posicionados
+            for sensor in sensors_positions:
+                self.draw_sensor_symbol((sensor[0], sensor[1]))
+                    
+            # Desenha na posição do mouse o sensor a ser posicionado 
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            self.draw_sensor_symbol((mouse_x, mouse_y))
+            
+            # Atualiza a tela
+            pygame.display.update()
+            
+        return sensors_relative_positions, closed
     
     def draw_robot(self, x, y, heading):
         """Desenha o robô na tela.
@@ -297,7 +365,18 @@ class Graphics:
         """
         
         # Desenha um círculo vermelho na posição do sensor
-        pygame.draw.circle(self.map, (255, 0, 0), (sensor.x, sensor.y), 5)
+        position = (int(sensor.x), int(sensor.y))
+        self.draw_sensor_symbol(position)
+        
+    def draw_sensor_symbol(self, position):
+        """Desenha um sensor na tela.
+        
+        Args:
+            position (tuple): posição (x,y) do sensor, em pixels.
+        """
+        
+        # Desenha um círculo vermelho na posição do sensor
+        pygame.draw.circle(self.map, (255, 0, 0), (position[0], position[1]), 5)
         
     def show_sensors_data(self, sensors):
         """Exibe os dados dos sensores na tela.
