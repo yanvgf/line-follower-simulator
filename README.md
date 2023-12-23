@@ -26,6 +26,7 @@ To run the simulation, execute the following command:
 ```bash
 $ python main.py
 ```
+<!-- TODO: adicionar descrição da janela de posicionamento dos sensores -->
 
 Before the simulation starts, you will be asked to position the robot in the map. It is as simple as clicking on the map where you want to place the robot and scrolling to rotate it. When you are done, press any key and the simulation will start.
 
