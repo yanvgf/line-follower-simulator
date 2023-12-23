@@ -11,7 +11,7 @@ import utils
 
 # Inicializa o mapa
 MAP_DIMENSIONS = (1300, 660) # 1360x768
-gfx = Graphics(MAP_DIMENSIONS, 'robot.png', 'map.png')
+gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
     
 # Inicializa o robô
 ROBOT_START = gfx.robot_positioning()
@@ -26,6 +26,9 @@ robot = Robot(initial_position=ROBOT_START,
               wheel_radius=WHEEL_RADIUS)
 
 # Inicializa sensores
+# TODO: permitir ao usuário posicionar os sensores
+# TODO: salvar as configurações de posição dos sensores e do robô em um arquivo separado
+#       pro usuário não ter que mexer toda hora que for rodar
 SENSORS_POSITIONS = [(40, -45),
                     (40, -20),
                     (40, 0),
