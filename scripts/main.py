@@ -68,16 +68,19 @@ while running:
     #
     # Escreve dados dos sensores na tela
     gfx.show_sensors_data(sensors)
-    
-    # Calcula o erro e escreve na tela
-    error = sensors[1].data - sensors[3].data
-    gfx.show_text(text=f"Error: "+ str(error),
-                  position=(10, 10 + 130))
-    
+
     # Calcula o tempo decorrido desde a última iteração
     current_time = pygame.time.get_ticks()
     dt = (current_time - last_time)/1000
     last_time = current_time
+
+# +=====================================================================+
+# |                         Control logic                               |
+# |                                                                     |
+    # Calcula o erro e escreve na tela
+    error = sensors[1].data - sensors[3].data
+    gfx.show_text(text=f"Error: "+ str(error),
+                  position=(10, 10 + 130))
     
     # Calcula PID
     pid, I = utils.PID(kp=50, ki=3, kd=0.01, I=I,
@@ -89,7 +92,10 @@ while running:
     # Atualiza velocidade dos motores baseado no controlador
     robot.left_motor.set_speed(robot.left_motor.max_motor_speed + pid)
     robot.right_motor.set_speed(robot.right_motor.max_motor_speed - pid)
-    
+# |                                                                     |
+# |                                                                     |
+# +=====================================================================+
+
     # Atualiza a posição do robô 
     robot.update_position(dt)
     
@@ -106,7 +112,7 @@ while running:
     if robot_is_out or sensor_is_out:
             
             gfx.show_out_of_bounds_error()
-
+            
             # Escreve na tela a mensagem de erro
             pygame.display.update()
             pygame.time.wait(3500)
