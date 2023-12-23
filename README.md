@@ -8,7 +8,7 @@ First, install the required packages. The **requirements.txt** file contains all
 If you use conda, you can create a new environment with the following command (in Linux or WSL):
 
 ```bash
-$ conda create --name <env> --file <this file>
+$ conda create --name wisard-line-follower --file requirements.txt
 ```
 
 Or you can install the packages with pip:
@@ -37,7 +37,7 @@ The robot will follow any black (or dark) line on the map.
 
 ### Changing the simulation parameters
 
-You can change the simulation parameters simply by changing the values in the beginning of the **main.py** file. Some of the parameters are:
+You can change the simulation parameters simply by changing the values in the beginning of the **scripts/main.py** file. Some of the parameters are:
 
 - chassis' width
 - motors' maximum speed
