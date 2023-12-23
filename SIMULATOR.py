@@ -55,13 +55,13 @@ class Robot:
     
     def turn_left(self):
         """Gira robô pra esquerda com velocidade máxima."""
-        self.left_wheel_speed = -self.max_speed
+        self.left_wheel_speed = self.max_speed/2
         self.right_wheel_speed = self.max_speed
     
     def turn_right(self):
         """Gira robô pra direita com velocidade máxima."""
         self.left_wheel_speed = self.max_speed
-        self.right_wheel_speed = -self.max_speed
+        self.right_wheel_speed = self.max_speed/2
     
     def stop(self):
         """Para o robô."""
@@ -175,6 +175,7 @@ class Sensor:
         # Retorna 0 se a cor for mais clara que o cinza médio e 1 caso contrário.
         self.data = 1 if is_darker(color, (255/2, 255/2, 255/2)) else 0
 
+
 # +===========================================================================+
 # |                            Classe Graphics                                |
 # +===========================================================================+
@@ -232,4 +233,24 @@ class Graphics:
         # Desenha um círculo vermelho na posição do sensor
         pygame.draw.circle(self.map, (255, 0, 0), (sensor.x, sensor.y), 5)
         
-    
+    def show_sensors_data(self, sensors):
+        """Exibe os dados dos sensores na tela.
+        
+        Args:
+            sensores (list): lista com os sensores.
+        """
+        
+        # Cria uma fonte
+        font = pygame.font.SysFont("Arial", 20)
+        
+        # Cria um texto com os dados do sensor
+        text = []
+        text_counter = 0
+        for sensor in sensors:
+            text.append(font.render(f"Sensor {text_counter}: "+ str(sensor.data), True, (0, 0, 0)))
+            text_counter += 1
+        
+        # Desenha o texto na tela
+        text_number = len(text)
+        for idx in range(text_number):
+            self.map.blit(text[idx], (10, 10 + 20*idx))
