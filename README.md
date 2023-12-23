@@ -1,6 +1,15 @@
 # WiSARD-line-follower
 Design and simulation of a line follower robot based on WiSARD weightless neural networks.
 
+**This project is still under development. Some of the features yet to be implemented are:**
+
+- [ ] Full translation to English
+- [ ] The WiSARD network itself
+- [ ] A more realistic kinematic model of the robot
+- [ ] Free adding and removing of sensors (currently, the number of sensors is fixed)
+- [ ] Saving and loading of robots configured before by the user
+
+
 ![robot_positioning_v1](https://github.com/yanvgf/WiSARD-line-follower/assets/93750334/5c36be7d-846e-4440-9fa9-3fee133d65b7)
 
 ## Requirements
