@@ -17,7 +17,7 @@ First, install the required packages. The **requirements.txt** file contains all
 If you use conda, you can create a new environment with the following command (in Linux or WSL):
 
 ```bash
-$ conda create --name wisard-line-follower --file requirements.txt
+$ conda create --name line-follower-simulator --file requirements.txt
 ```
 
 Or you can install the packages with pip:
