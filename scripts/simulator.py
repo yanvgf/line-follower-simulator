@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+import utils
 
 # +===========================================================================+
 # |                      Classes Robot, Motor e Sensor                        |
@@ -119,43 +120,6 @@ class Robot:
 # +===========================================================================+
 # |                             Classe Sensor                                 |
 # +===========================================================================+
-
-def rotate_vector(vector, angle):
-    """Rotaciona um vetor em um ângulo.
-    
-    Args:
-        vector (tuple): vetor a ser rotacionado (x, y).
-        angle (float): ângulo de rotação, em radianos.
-        
-    Returns:
-        tuple: vetor rotacionado (x, y).
-    """
-    
-    # Matriz de rotação
-    rotation_matrix = np.array([[np.cos(angle), -np.sin(angle)],
-                                [np.sin(angle), np.cos(angle)]])
-    
-    # Multiplica o vetor pela matriz de rotação
-    rotated_vector = rotation_matrix.dot(vector)
-    
-    return rotated_vector
-
-def is_darker(color1, color2):
-    """Verifica se a cor1 é mais escura que a cor2.
-    
-    Args:
-        color1, color2 (tuple): Cores no formato RGB (R, G, B).
-        
-    Returns:
-        bool: True se a cor1 for mais escura que a cor2, False caso contrário.
-    """
-    # Calcula a média dos valores RGB de cada cor (escala de cinza)
-    gray1 = sum(color1) / len(color1)
-    gray2 = sum(color2) / len(color2)
-    
-    return gray1 < gray2
-
-
 class Sensor:
     """Sensor de linha."""
     
@@ -168,7 +132,7 @@ class Sensor:
         """
         
         # Rotaciona vetor de posição do sensor de acordo com o ângulo do robô
-        sensor_position_rotated = rotate_vector(sensor_relative_position, robot_initial_position[2])
+        sensor_position_rotated = utils.rotate_vector(sensor_relative_position, robot_initial_position[2])
         
         # Adiciona o vetor de posição relativa (rotacionado) à posição inicial do robô
         self.x = robot_initial_position[0] + sensor_position_rotated[0] 
@@ -181,7 +145,7 @@ class Sensor:
             robot_position (tuple): posição atual do robô (x, y, heading), em metros e radianos.
         """
         # Rotaciona vetor de posição relativa do sensor de acordo com o ângulo do robô
-        sensor_position_rotated = rotate_vector(sensor_relative_position, robot_position[2])
+        sensor_position_rotated = utils.rotate_vector(sensor_relative_position, robot_position[2])
         
         # Adiciona o vetor de posição relativa à posição do robô pra obter a posição real do sensor
         self.x = robot_position[0] + sensor_position_rotated[0] 
@@ -198,7 +162,7 @@ class Sensor:
         color = map_image.get_at((int(self.x), int(self.y)))[:-1]
         
         # Retorna 0 se a cor for mais clara que o cinza médio e 1 caso contrário.
-        self.data = 1 if is_darker(color, (255/2, 255/2, 255/2)) else 0
+        self.data = 1 if utils.is_darker(color, (255/2, 255/2, 255/2)) else 0
 
 
 # +===========================================================================+
