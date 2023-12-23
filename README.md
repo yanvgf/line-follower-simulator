@@ -1,4 +1,4 @@
-# WiSARD-line-follower
+# line-follower-simulator
 Design of a simple line follower robot simulator in Python.
 
 **This project is still under development. Some of the features yet to be implemented are:**
