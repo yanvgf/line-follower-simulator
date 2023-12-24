@@ -6,14 +6,14 @@ import utils
 
 
 # +=====================================================================+
-# |                         Inicialização                               |
+# |                         Initialization                             |
 # +=====================================================================+
 
-# Inicializa o mapa
+# Initialize the map
 MAP_DIMENSIONS = (1300, 660) # 1360x768
 gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
-    
-# Inicializa o robô
+
+# Initialize the robot
 ROBOT_START, closed = gfx.robot_positioning()
 ROBOT_WIDTH = 0.1
 INITIAL_MOTOR_SPEED = 10000
@@ -25,14 +25,13 @@ robot = Robot(initial_position=ROBOT_START,
               max_motor_speed=MAX_MOTOR_SPEED,
               wheel_radius=WHEEL_RADIUS)
 
-# Inicializa sensores
-# TODO: salvar as configurações de posição dos sensores e do robô em um arquivo separado
-#       pro usuário não ter que mexer toda hora que for rodar
+# Initialize sensors
+# TODO: save the robot and sensor positions in a file, so the user doesn't have to do it every time
 SENSORS_POSITIONS, closed = gfx.sensors_positioning(ROBOT_START, closed)
 sensors = [Sensor(position, ROBOT_START) for position in SENSORS_POSITIONS]
 
 # +=====================================================================+
-# |                            Simulação                                |
+# |                            Simulation                               |
 # +=====================================================================+
 
 last_time = pygame.time.get_ticks()
@@ -42,77 +41,77 @@ I = 0 # PID integral
 running = True
 
 while running and not(closed):
-    
-    # Verifica se o usuário fechou a janela
+        
+    # Check if the user closed the window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     
-    # Desenha mapa
+    # Draw map
     gfx.map.blit(gfx.map_image, (0, 0))
     #
-    # Desenha o robô
+    # Draw the robot
     gfx.draw_robot(robot.x, robot.y, robot.heading)
     #
-    # Desenha os sensores
+    # Draw the sensors
     for sensor in sensors:
         gfx.draw_sensor(sensor)
-       
-    # Lê os sensores
+    
+    # Read the sensors
     for idx in range(len(sensors)):
         sensors[idx].read_data(gfx.map_image)
     #
-    # Escreve dados dos sensores na tela
+    # Write sensors data on the screen
     gfx.show_sensors_data(sensors)
 
-    # Calcula o tempo decorrido desde a última iteração
+    # Calculate the elapsed time since the last iteration
     current_time = pygame.time.get_ticks()
     dt = (current_time - last_time)/1000
     last_time = current_time
 
-# +=====================================================================+
-# |                         Control logic                               |
-# |                                                                     |
-    # Calcula o erro e escreve na tela
+    # +=====================================================================+
+    # |                         Control logic                               |
+    # |                                                                     |
+    # Calculate the error and write it on the screen
     error = sensors[3].data - sensors[1].data
     gfx.show_text(text=f"Error: "+ str(error),
-                  position=(10, 10 + 130))
+                    position=(10, 10 + 130))
     
-    # Calcula PID
+    # Calculate PID
     pid, I = utils.PID(kp=50, ki=3, kd=0.01, I=I,
-                 error=error, last_error=last_error, dt=dt)
+                    error=error, last_error=last_error, dt=dt)
     
-    # Atualiza o erro anterior
+    # Update the previous error
     last_error = error
     
-    # Atualiza velocidade dos motores baseado no controlador
+    # Update motors speed based on the controller
     robot.left_motor.set_speed(robot.left_motor.max_motor_speed + pid)
     robot.right_motor.set_speed(robot.right_motor.max_motor_speed - pid)
-# |                                                                     |
-# |                                                                     |
-# +=====================================================================+
-
-    # Atualiza a posição do robô 
+    # |                                                                     |
+    # |                                                                     |
+    # +=====================================================================+
+    
+    # Update robot position
     robot.update_position(dt)
     
-    # Atualiza a posição dos sensores
+    # Update sensors position
     for idx in range(len(sensors)):
         sensors[idx].update_position(robot_position=(robot.x, robot.y, robot.heading),
                             sensor_relative_position=SENSORS_POSITIONS[idx])
-
-    # Verifica se o robô saiu do mapa
+    
+    # Check if the robot is out of bounds
     robot_is_out = gfx.is_out_of_bounds(robot)
     sensor_is_out = bool(np.sum([gfx.is_out_of_bounds(sensor) for sensor in sensors]))
     #
-    # Escreve mensagem de erro se robô saiu do mapa
+    # Write error message if robot is out of bounds
     if robot_is_out or sensor_is_out:
             
             gfx.show_out_of_bounds_error()
             
-            # Escreve na tela a mensagem de erro
+            # Write error message on the screen
             pygame.display.update()
             pygame.time.wait(3500)
             running = False
-    
+            
     if running:
         pygame.display.update()
