@@ -47,28 +47,30 @@ if answer == 'y':
     # Place the sensors
     SENSORS_POSITIONS, closed = gfx.sensors_positioning(SENSORS_NUMBER, ROBOT_START, closed)
 
-    # TODO: check if all the setup steps were completed (if not, don't update the setup.txt file
-    # and tell this to the user)
-    # Write exiting message on the screen
-    gfx.show_important_message("The setup is complete! Exiting and saving...")
-    pygame.display.update()
-    pygame.time.wait(1500)
+    if not(closed):
+        # Write successfull exiting message on the screen
+        gfx.show_important_message("The setup is complete! Exiting and saving...")
+        pygame.display.update()
+        pygame.time.wait(1500)
+        
+        # +=====================================================================+
+        # |                        Saving the robot info                        |
+        # +=====================================================================+
 
+        setup_info = f"""{ROBOT_WIDTH}
+        {INITIAL_MOTOR_SPEED}
+        {MAX_MOTOR_SPEED}
+        {WHEEL_RADIUS} 
+        {SENSORS_NUMBER}
+        {MAP_DIMENSIONS}
+        {ROBOT_START}
+        {SENSORS_POSITIONS}
+        {SENSOR_COLORS}
+        """
 
-    # +=====================================================================+
-    # |                        Saving the robot info                        |
-    # +=====================================================================+
+        # Write the setup.txt file
+        utils.write_setup_file(setup_info)
 
-    setup_info = f"""{ROBOT_WIDTH}
-    {INITIAL_MOTOR_SPEED}
-    {MAX_MOTOR_SPEED}
-    {WHEEL_RADIUS} 
-    {SENSORS_NUMBER}
-    {MAP_DIMENSIONS}
-    {ROBOT_START}
-    {SENSORS_POSITIONS}
-    {SENSOR_COLORS}
-    """
-
-    # Write the setup.txt file
-    utils.write_setup_file(setup_info)
+    else:
+        # Write error exiting message on the screen
+        print("\033[91m {}\033[00m" .format("\nThe setup was not completed! Exiting without saving...\n"))
