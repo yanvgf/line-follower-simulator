@@ -8,8 +8,6 @@ The robot will navigate along any user-designed track used as a map (as long as 
 **This project is still under development. Some of the features yet to be implemented are:**
 
 - [ ] A more realistic kinematic model of the robot
-- [ ] Free adding and removing of sensors (currently, the number of sensors is fixed)
-- [ ] Saving and loading of robots configured before by the user
 
 ## Requirements
 
