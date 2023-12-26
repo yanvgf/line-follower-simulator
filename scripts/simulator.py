@@ -192,7 +192,6 @@ class Graphics:
         # Draws the arena
         self.map.blit(self.map_image, (0, 0))
     
-    # TODO: place a box around the instructions with white background
     def robot_positioning(self):
         """Positions the robot according to the user's mouse click.
             
@@ -247,16 +246,32 @@ class Graphics:
             # Draws the map
             self.map.blit(self.map_image, (0, 0))
             
-            # Writes the robot positioning message on the screen
+            # Draws a box with instructions
+            BOX_POSITION = (10, 80)
+            BOX_SIZE = (480, 150)
+            if xy_positioned and heading_positioned:
+                BOX_SIZE = (480, 200)
+            BOX_COLOR = (0, 0, 0)
+            BOX_BACKGROUND_COLOR = (255, 255, 255)  # White for the background
+            BOX_BORDER_WIDTH = 2
+            box = pygame.Rect(BOX_POSITION, BOX_SIZE)
+            #
+            # Draw the box background
+            pygame.draw.rect(self.map, BOX_BACKGROUND_COLOR, box)
+            #
+            # Draw the box border
+            pygame.draw.rect(self.map, BOX_COLOR, box, BOX_BORDER_WIDTH)
+            #
+            # Writes the robot positioning instructions
             self.show_text(text="Position the robot:",
                         position=(20, 100), fontsize=25)
-            
+            #
             self.show_text(text=f"{heading_marker} Scroll the mouse wheel to rotate the robot.",
                         position=(40, 150), fontsize=20)
-            
+            #
             self.show_text(text=f"{xy_marker} Left click to position the robot.",
                         position=(40, 190), fontsize=20)
-            
+            #
             if xy_positioned and heading_positioned:
                 self.show_text(text="Press any key to continue.",
                             position=(20, 240), fontsize=25)
@@ -274,7 +289,6 @@ class Graphics:
         return (robot_start_x, robot_start_y, robot_start_heading), closed
     
     # TODO: allow the user to choose the number of sensors
-    # TODO: place a box around the instructions with white background
     def sensors_positioning(self, robot_start, closed):
         """Positions the sensors according to the user's mouse click.
         
@@ -322,13 +336,27 @@ class Graphics:
             # Draws the robot at the initial position
             self.draw_robot(robot_start[0], robot_start[1], robot_start[2])
             
-            # Writes the sensor positioning message on the screen
+            # Writes the robot positioning instructions
+            BOX_POSITION = (10, 80)
+            BOX_SIZE = (460, 150)
+            BOX_COLOR = (0, 0, 0)  # Black for the border
+            BOX_BACKGROUND_COLOR = (255, 255, 255)  # White for the background
+            BOX_BORDER_WIDTH = 2
+            box = pygame.Rect(BOX_POSITION, BOX_SIZE)
+            #
+            # Draw the box background
+            pygame.draw.rect(self.map, BOX_BACKGROUND_COLOR, box)
+            #
+            # Draw the box border
+            pygame.draw.rect(self.map, BOX_COLOR, box, BOX_BORDER_WIDTH)
+            #
+            # Writes the sensor positioning instructions on the screen
             self.show_text(text="Position the sensors:",
                         position=(20, 100), fontsize=25)
-            
+            #
             self.show_text(text="Left click to position each sensor.",
                         position=(40, 150), fontsize=20)
-            
+            #
             self.show_text(text=f"Positioned: {counter}/5",
                         position=(20, 190), fontsize=25)
             

@@ -44,10 +44,12 @@ if answer == 'y':
     # Place the sensors
     SENSORS_POSITIONS, closed = gfx.sensors_positioning(ROBOT_START, closed)
 
+    # TODO: check if all the setup steps were completed (if not, don't update the setup.txt file
+    # and tell this to the user)
     # Write exiting message on the screen
     gfx.show_important_message("The setup is complete! Exiting and saving...")
     pygame.display.update()
-    pygame.time.wait(3500)
+    pygame.time.wait(1500)
 
 
     # +=====================================================================+
