@@ -3,6 +3,8 @@ Design of a simple line follower robot simulator in Python.
 
 ![robot_positioning_v2](https://github.com/yanvgf/line-follower-simulator/assets/93750334/a583e610-0dc0-4072-b5b2-2bd48890b2c3)
 
+The robot will navigate along any user-designed track used as a map (as long as the line is darker than the rest of the map), according to the user-defined control logic and sensors positioning. In the video above, the robot employs a PID control strategy to accurately trace the specified line.
+
 **This project is still under development. Some of the features yet to be implemented are:**
 
 - [ ] A more realistic kinematic model of the robot
