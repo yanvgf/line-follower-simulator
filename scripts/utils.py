@@ -86,7 +86,7 @@ def read_setup_file():
     """Reads the setup.txt file and returns the robot parameters.
     
     Returns:
-        tuple: Robot parameters: ROBOT_WIDTH, INITIAL_MOTOR_SPEED, MAX_MOTOR_SPEED, WHEEL_RADIUS, SENSORS_NUMBER, MAP_DIMENSIONS, ROBOT_START, SENSORS_POSITIONS.
+        tuple: Robot parameters: ROBOT_WIDTH, INITIAL_MOTOR_SPEED, MAX_MOTOR_SPEED, WHEEL_RADIUS, SENSORS_NUMBER, MAP_DIMENSIONS, ROBOT_START, SENSORS_POSITIONS, SENSOR_COLORS.
     """
     
     with open('setup.txt', 'r') as file:
@@ -105,5 +105,6 @@ def read_setup_file():
         MAP_DIMENSIONS = eval(lines[5])
         ROBOT_START = eval(lines[6])
         SENSORS_POSITIONS = eval(lines[7])
+        SENSOR_COLORS = eval(lines[8])
         
-        return ROBOT_WIDTH, INITIAL_MOTOR_SPEED, MAX_MOTOR_SPEED, WHEEL_RADIUS, SENSORS_NUMBER, MAP_DIMENSIONS, ROBOT_START, SENSORS_POSITIONS
+        return ROBOT_WIDTH, INITIAL_MOTOR_SPEED, MAX_MOTOR_SPEED, WHEEL_RADIUS, SENSORS_NUMBER, MAP_DIMENSIONS, ROBOT_START, SENSORS_POSITIONS, SENSOR_COLORS

@@ -1,7 +1,7 @@
 import pygame
 import os
 
-from simulator import Graphics
+from classes import Graphics
 import utils
 
 # +=====================================================================+
@@ -12,10 +12,13 @@ INITIAL_MOTOR_SPEED = 10000 # Initial speed (rpm) of both motors
 MAX_MOTOR_SPEED = 20000 # Max speed (rpm) of both motors
 WHEEL_RADIUS = 0.04 # Radius of both the wheels (meters) 
 SENSORS_NUMBER = 5 # Number of sensors
+SENSOR_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
+                (255, 255, 0), (0, 255, 255), (255, 0, 255),
+                (255, 255, 255), (128, 0, 0), (0, 128, 0),
+                (0, 0, 128)]
 # |                                                                     |
 # |                                                                     |
 # +=====================================================================+
-
 
 # Verify if the user wants to create a new setup file or use an existing one
 if os.path.isfile('setup.txt'):
@@ -42,7 +45,7 @@ if answer == 'y':
     ROBOT_START, closed = gfx.robot_positioning()
 
     # Place the sensors
-    SENSORS_POSITIONS, closed = gfx.sensors_positioning(ROBOT_START, closed)
+    SENSORS_POSITIONS, closed = gfx.sensors_positioning(SENSORS_NUMBER, ROBOT_START, closed)
 
     # TODO: check if all the setup steps were completed (if not, don't update the setup.txt file
     # and tell this to the user)
@@ -64,6 +67,7 @@ if answer == 'y':
     {MAP_DIMENSIONS}
     {ROBOT_START}
     {SENSORS_POSITIONS}
+    {SENSOR_COLORS}
     """
 
     # Write the setup.txt file

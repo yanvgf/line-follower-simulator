@@ -2,6 +2,12 @@ import numpy as np
 import pygame
 import utils
 
+
+
+# +===========================================================================+
+# |                     Robot class (and related classes)                     |                              |
+# +===========================================================================+
+
 class Motor:
     """Robot motor. Composes the Robot class."""
     
@@ -24,9 +30,55 @@ class Motor:
         """
         
         self.speed = speed
+
+
+class Sensor:
+    """Line sensor. Composes the Robot class."""
+    
+    def __init__(self, sensor_relative_position, robot_initial_position):
+        """Sensor class constructor. Positions the sensor relative to the robot's initial position.
         
+        Args:
+            sensor_relative_position (tuple): sensor position (x, y) relative to the robot, in meters.
+            robot_initial_position (tuple): robot initial position (x, y, heading), in meters and radians.
+        """
+        
+        # Rotates the sensor position vector according to the robot's angle
+        sensor_position_rotated = utils.rotate_vector(sensor_relative_position, robot_initial_position[2])
+        
+        # Adds the relative position vector (rotated) to the robot's initial position
+        self.x = robot_initial_position[0] + sensor_position_rotated[0] 
+        self.y = robot_initial_position[1] - sensor_position_rotated[1] # y-axis is inverted
+        
+    def update_position(self, sensor_relative_position, robot_position):
+        """Updates the sensor's position according to the robot's position.
+        
+        Args:
+            robot_position (tuple): robot current position (x, y, heading), in meters and radians.
+        """
+        # Rotates the sensor's relative position vector according to the robot's angle
+        sensor_position_rotated = utils.rotate_vector(sensor_relative_position, robot_position[2])
+        
+        # Adds the relative position vector to the robot's position to obtain the sensor's real position
+        self.x = robot_position[0] + sensor_position_rotated[0] 
+        self.y = robot_position[1] - sensor_position_rotated[1] # y-axis is inverted
+    
+    def read_data(self, map_image):
+        """Reads the sensor data. The sensor returns 0 if it reads a dark color and 1 if it reads a light color.
+        
+        Args:
+            map_image (pygame.Surface): arena image.
+        """
+        
+        # Sensor reads the color of the arena pixel at the sensor position
+        color = map_image.get_at((int(self.x), int(self.y)))[:-1]
+        
+        # Returns 1 if the color is lighter than medium gray and 0 otherwise.
+        self.data = 0 if utils.is_darker(color, (255/2, 255/2, 255/2)) else 1
+  
+  
 class Robot:
-    """Differential robot model."""
+    """Differential robot model. Composed by the Motor class and the Sensor class."""
     
     def __init__(self, initial_position, width, 
                  initial_motor_speed=500, max_motor_speed=1000, wheel_radius=0.04):
@@ -42,6 +94,9 @@ class Robot:
                 Defaults to 1000.
             wheel_radius (float, optional): wheel radius, in meters. Defaults to 0.04.
         """
+        
+        # List of the robot sensors
+        self.sensors = []
         
         # Scale factor from meters to pixels
         self.meters_to_pixels = 3779.52
@@ -113,56 +168,16 @@ class Robot:
         self.left_motor.set_speed(0)
         self.right_motor.set_speed(0)
     
-# +===========================================================================+
-# |                               Sensor class                                |
-# +===========================================================================+
+    def add_sensor(self, sensor_relative_position, robot_initial_position):
+        """Adds a sensor to the robot.
+        
+        Args:
+            sensor (Sensor): sensor to be added.
+        """
+        self.sensors.append(Sensor(sensor_relative_position, robot_initial_position))
+        
+        
 
-# TODO: compose the Robot class with the Sensor class
-class Sensor:
-    """Line sensor."""
-    
-    def __init__(self, sensor_relative_position, robot_initial_position):
-        """Sensor class constructor. Positions the sensor relative to the robot's initial position.
-        
-        Args:
-            sensor_relative_position (tuple): sensor position (x, y) relative to the robot, in meters.
-            robot_initial_position (tuple): robot initial position (x, y, heading), in meters and radians.
-        """
-        
-        # Rotates the sensor position vector according to the robot's angle
-        sensor_position_rotated = utils.rotate_vector(sensor_relative_position, robot_initial_position[2])
-        
-        # Adds the relative position vector (rotated) to the robot's initial position
-        self.x = robot_initial_position[0] + sensor_position_rotated[0] 
-        self.y = robot_initial_position[1] - sensor_position_rotated[1] # y-axis is inverted
-        
-    def update_position(self, sensor_relative_position, robot_position):
-        """Updates the sensor's position according to the robot's position.
-        
-        Args:
-            robot_position (tuple): robot current position (x, y, heading), in meters and radians.
-        """
-        # Rotates the sensor's relative position vector according to the robot's angle
-        sensor_position_rotated = utils.rotate_vector(sensor_relative_position, robot_position[2])
-        
-        # Adds the relative position vector to the robot's position to obtain the sensor's real position
-        self.x = robot_position[0] + sensor_position_rotated[0] 
-        self.y = robot_position[1] - sensor_position_rotated[1] # y-axis is inverted
-    
-    def read_data(self, map_image):
-        """Reads the sensor data. The sensor returns 1 if it reads a dark color and 0 if it reads a light color.
-        
-        Args:
-            map_image (pygame.Surface): arena image.
-        """
-        
-        # Sensor reads the color of the arena pixel at the sensor position
-        color = map_image.get_at((int(self.x), int(self.y)))[:-1]
-        
-        # FIXME: change to white = 1 and black = 0
-        # Returns 0 if the color is lighter than medium gray and 1 otherwise.
-        self.data = 1 if utils.is_darker(color, (255/2, 255/2, 255/2)) else 0
-    
 # +===========================================================================+
 # |                               Graphics class                              |
 # +===========================================================================+
@@ -288,11 +303,11 @@ class Graphics:
             
         return (robot_start_x, robot_start_y, robot_start_heading), closed
     
-    # TODO: allow the user to choose the number of sensors
-    def sensors_positioning(self, robot_start, closed):
+    def sensors_positioning(self, number_of_sensors, robot_start, closed):
         """Positions the sensors according to the user's mouse click.
         
         Args:
+            number_of_sensors (int): number of sensors (max = 10).
             robot_start (tuple): robot initial position (x, y, heading).
             closed (bool): True if the user closed the last window, False otherwise.
             
@@ -306,7 +321,12 @@ class Graphics:
         sensors_relative_positions = []
         counter = 0
         
-        while counter < 5 and running and not(closed):
+        sensor_colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
+                        (255, 255, 0), (0, 255, 255), (255, 0, 255),
+                        (255, 255, 255), (128, 0, 0), (0, 128, 0),
+                        (0, 0, 128)]
+        
+        while counter < number_of_sensors and running and not(closed):
             
             for event in pygame.event.get():
                 
@@ -357,16 +377,20 @@ class Graphics:
             self.show_text(text="Left click to position each sensor.",
                         position=(40, 150), fontsize=20)
             #
-            self.show_text(text=f"Positioned: {counter}/5",
+            self.show_text(text=f"Positioned: {counter}/{number_of_sensors}",
                         position=(20, 190), fontsize=25)
             
             # Draws the positioned sensors at the desired position
             for sensor in sensors_positions:
-                self.draw_sensor_symbol((sensor[0], sensor[1]))
+                self.draw_sensor_symbol((sensor[0], sensor[1]), color=sensor_colors[sensors_positions.index(sensor)])
                     
             # Draws the sensor to be positioned at the mouse position 
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            self.draw_sensor_symbol((mouse_x, mouse_y))
+            if counter < number_of_sensors:
+                color_counter = counter
+            else:
+                color_counter = number_of_sensors - 1
+            self.draw_sensor_symbol((mouse_x, mouse_y), color=sensor_colors[color_counter])
             
             # Updates the screen
             pygame.display.update()
@@ -391,7 +415,7 @@ class Graphics:
         # Draws the robot on the screen at the rectangle position
         self.map.blit(rotated_robot, rect)
         
-    def draw_sensor(self, sensor):
+    def draw_sensor(self, sensor, color=(255, 0, 0)):
         """Draws a sensor on the screen.
         
         Args:
@@ -400,23 +424,25 @@ class Graphics:
         
         # Draws a red circle at the sensor position
         position = (int(sensor.x), int(sensor.y))
-        self.draw_sensor_symbol(position)
+        self.draw_sensor_symbol(position, color)
         
-    def draw_sensor_symbol(self, position):
+    def draw_sensor_symbol(self, position, color=(255, 0, 0)):
         """Draws a sensor on the screen.
         
         Args:
             position (tuple): sensor position (x, y), in pixels.
         """
         
-        # Draws a red circle at the sensor position
-        pygame.draw.circle(self.map, (255, 0, 0), (position[0], position[1]), 5)
+        # Draws a circle with a black border at the sensor position
+        pygame.draw.circle(self.map, (0, 0, 0), (position[0], position[1]), 6)
+        pygame.draw.circle(self.map, color, (position[0], position[1]), 5)
         
-    def show_sensors_data(self, sensors):
+    def show_sensors_data(self, sensors, sensor_colors):
         """Displays the sensor data on the screen.
         
         Args:
             sensores (list): list of sensors.
+            
         """
         
         # Creates a font
@@ -426,13 +452,28 @@ class Graphics:
         text = []
         text_counter = 0
         for sensor in sensors:
-            text.append(font.render(f"Sensor {text_counter}: "+ str(sensor.data), True, (0, 0, 0)))
+            text.append(font.render(f"{text_counter}  = "+ str(sensor.data), True, (0, 0, 0)))
             text_counter += 1
         
-        # Draws the text on the screen
+        # Draws a box around the text
+        BOX_POSITION = (10, 35)
+        BOX_SIZE = (100, 30 + 20*len(text))
+        BOX_COLOR = (0, 0, 0)
+        BOX_BACKGROUND_COLOR = (255, 255, 255)
+        BOX_BORDER_WIDTH = 2
+        box = pygame.Rect(BOX_POSITION, BOX_SIZE)
+        #
+        # Draw the box background
+        pygame.draw.rect(self.map, BOX_BACKGROUND_COLOR, box)
+        #
+        # Draw the box border
+        pygame.draw.rect(self.map, BOX_COLOR, box, BOX_BORDER_WIDTH)
+        
+        # Draws the text and sensor symbol on the screen
         text_number = len(text)
         for idx in range(text_number):
-            self.map.blit(text[idx], (10, 10 + 20*idx))
+            self.draw_sensor_symbol((30, 58 + 20*idx), color=sensor_colors[idx])
+            self.map.blit(text[idx], (40, 50 + 20*idx))
             
     def is_out_of_bounds(self, object):
         """Checks if the object is out of bounds.

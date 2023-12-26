@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
 
-from simulator import Robot, Sensor, Graphics
+from classes import Robot, Graphics
 import utils
 
 
@@ -20,6 +20,7 @@ SENSORS_NUMBER = setup_info[4]
 MAP_DIMENSIONS = setup_info[5]
 ROBOT_START = setup_info[6]
 SENSORS_POSITIONS = setup_info[7]
+SENSOR_COLORS = setup_info[8]
 
 # Initialize the map
 gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
@@ -32,7 +33,8 @@ robot = Robot(initial_position=ROBOT_START,
               wheel_radius=WHEEL_RADIUS)
 
 # Initialize sensors
-sensors = [Sensor(position, ROBOT_START) for position in SENSORS_POSITIONS]
+for position in SENSORS_POSITIONS:
+    robot.add_sensor(position, ROBOT_START)
 
 # +=====================================================================+
 # |                            Simulation                               |
@@ -58,15 +60,15 @@ while running:
     gfx.draw_robot(robot.x, robot.y, robot.heading)
     #
     # Draw the sensors
-    for sensor in sensors:
-        gfx.draw_sensor(sensor)
+    for sensor in robot.sensors:
+        gfx.draw_sensor(sensor, color=SENSOR_COLORS[robot.sensors.index(sensor)])
     
     # Read the sensors
-    for idx in range(len(sensors)):
-        sensors[idx].read_data(gfx.map_image)
+    for idx in range(len(robot.sensors)):
+        robot.sensors[idx].read_data(gfx.map_image)
     #
     # Write sensors data on the screen
-    gfx.show_sensors_data(sensors)
+    gfx.show_sensors_data(robot.sensors, sensor_colors=SENSOR_COLORS[:SENSORS_NUMBER])
 
     # Calculate the elapsed time since the last iteration
     current_time = pygame.time.get_ticks()
@@ -76,10 +78,8 @@ while running:
     # +=====================================================================+
     # |                         Control logic                               |
     # |                                                                     |
-    # Calculate the error and write it on the screen
-    error = sensors[3].data - sensors[1].data
-    gfx.show_text(text=f"Error: "+ str(error),
-                    position=(10, 10 + 130))
+    # Calculate the error
+    error =  robot.sensors[1].data - robot.sensors[3].data
     
     # Calculate PID
     pid, I = utils.PID(kp=50, ki=3, kd=0.01, I=I,
@@ -99,13 +99,13 @@ while running:
     robot.update_position(dt)
     
     # Update sensors position
-    for idx in range(len(sensors)):
-        sensors[idx].update_position(robot_position=(robot.x, robot.y, robot.heading),
+    for idx in range(len(robot.sensors)):
+        robot.sensors[idx].update_position(robot_position=(robot.x, robot.y, robot.heading),
                             sensor_relative_position=SENSORS_POSITIONS[idx])
     
     # Check if the robot is out of bounds
     robot_is_out = gfx.is_out_of_bounds(robot)
-    sensor_is_out = bool(np.sum([gfx.is_out_of_bounds(sensor) for sensor in sensors]))
+    sensor_is_out = bool(np.sum([gfx.is_out_of_bounds(sensor) for sensor in robot.sensors]))
     #
     # Write error message if robot is out of bounds
     if robot_is_out or sensor_is_out:
