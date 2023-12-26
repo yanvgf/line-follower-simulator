@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 def PID(kp, ki, kd, I,
         error, last_error, dt):
@@ -63,3 +64,46 @@ def is_darker(color1, color2):
     
     return gray1 < gray2
 
+def write_setup_file(setup_info):
+    """Writes the setup.txt file.
+    
+    Args:
+        setup_info (str): Setup information.
+    """
+    
+    if os.path.isfile('setup.txt'):
+        # There is a setup.txt file already
+        with open('setup.txt', 'w') as file:
+            pass # Erases the file content
+        with open('setup.txt', 'w') as file:
+            file.write(setup_info) # Writes new content
+    else:
+        # There is no setup.txt file yet
+        with open('setup.txt', 'w') as file:
+            file.write(setup_info)
+
+def read_setup_file():
+    """Reads the setup.txt file and returns the robot parameters.
+    
+    Returns:
+        tuple: Robot parameters: ROBOT_WIDTH, INITIAL_MOTOR_SPEED, MAX_MOTOR_SPEED, WHEEL_RADIUS, SENSORS_NUMBER, MAP_DIMENSIONS, ROBOT_START, SENSORS_POSITIONS.
+    """
+    
+    with open('setup.txt', 'r') as file:
+        # Read the file content
+        content = file.read()
+        
+        # Split the content in lines
+        lines = content.split('\n')
+        
+        # Read the robot parameters
+        ROBOT_WIDTH = float(lines[0])
+        INITIAL_MOTOR_SPEED = int(lines[1])
+        MAX_MOTOR_SPEED = int(lines[2])
+        WHEEL_RADIUS = float(lines[3])
+        SENSORS_NUMBER = int(lines[4])
+        MAP_DIMENSIONS = eval(lines[5])
+        ROBOT_START = eval(lines[6])
+        SENSORS_POSITIONS = eval(lines[7])
+        
+        return ROBOT_WIDTH, INITIAL_MOTOR_SPEED, MAX_MOTOR_SPEED, WHEEL_RADIUS, SENSORS_NUMBER, MAP_DIMENSIONS, ROBOT_START, SENSORS_POSITIONS

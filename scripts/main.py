@@ -9,16 +9,22 @@ import utils
 # |                         Initialization                             |
 # +=====================================================================+
 
+# Read the setup file
+setup_info = utils.read_setup_file()
+#
+ROBOT_WIDTH = setup_info[0]
+INITIAL_MOTOR_SPEED = setup_info[1]
+MAX_MOTOR_SPEED = setup_info[2]
+WHEEL_RADIUS = setup_info[3]
+SENSORS_NUMBER = setup_info[4]
+MAP_DIMENSIONS = setup_info[5]
+ROBOT_START = setup_info[6]
+SENSORS_POSITIONS = setup_info[7]
+
 # Initialize the map
-MAP_DIMENSIONS = (1300, 660) # 1360x768
 gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
 
 # Initialize the robot
-ROBOT_START, closed = gfx.robot_positioning()
-ROBOT_WIDTH = 0.1
-INITIAL_MOTOR_SPEED = 10000
-MAX_MOTOR_SPEED = 20000
-WHEEL_RADIUS = 0.04
 robot = Robot(initial_position=ROBOT_START,
               width=ROBOT_WIDTH,
               initial_motor_speed=INITIAL_MOTOR_SPEED,
@@ -26,8 +32,6 @@ robot = Robot(initial_position=ROBOT_START,
               wheel_radius=WHEEL_RADIUS)
 
 # Initialize sensors
-# TODO: save the robot and sensor positions in a file, so the user doesn't have to do it every time
-SENSORS_POSITIONS, closed = gfx.sensors_positioning(ROBOT_START, closed)
 sensors = [Sensor(position, ROBOT_START) for position in SENSORS_POSITIONS]
 
 # +=====================================================================+
@@ -40,7 +44,7 @@ I = 0 # PID integral
 
 running = True
 
-while running and not(closed):
+while running:
         
     # Check if the user closed the window
     for event in pygame.event.get():
@@ -106,7 +110,7 @@ while running and not(closed):
     # Write error message if robot is out of bounds
     if robot_is_out or sensor_is_out:
             
-            gfx.show_out_of_bounds_error()
+            gfx.show_important_message("The robot went off the map!")
             
             # Write error message on the screen
             pygame.display.update()

@@ -117,6 +117,7 @@ class Robot:
 # |                               Sensor class                                |
 # +===========================================================================+
 
+# TODO: compose the Robot class with the Sensor class
 class Sensor:
     """Line sensor."""
     
@@ -191,6 +192,7 @@ class Graphics:
         # Draws the arena
         self.map.blit(self.map_image, (0, 0))
     
+    # TODO: place a box around the instructions with white background
     def robot_positioning(self):
         """Positions the robot according to the user's mouse click.
             
@@ -271,6 +273,8 @@ class Graphics:
             
         return (robot_start_x, robot_start_y, robot_start_heading), closed
     
+    # TODO: allow the user to choose the number of sensors
+    # TODO: place a box around the instructions with white background
     def sensors_positioning(self, robot_start, closed):
         """Positions the sensors according to the user's mouse click.
         
@@ -308,7 +312,7 @@ class Graphics:
                     sensor_relative_x = sensor_x - robot_start[0]
                     sensor_relative_y = robot_start[1] - sensor_y
                     sensor_relative = utils.rotate_vector((sensor_relative_x, sensor_relative_y), -robot_start[2])
-                    sensors_relative_positions.append(sensor_relative)
+                    sensors_relative_positions.append(list(sensor_relative))
                     
                     counter += 1
             
@@ -421,11 +425,15 @@ class Graphics:
         else:
             return False
         
-    def show_out_of_bounds_error(self):
-        """Displays an error message on the screen when the robot goes off the map."""
+    def show_important_message(self, message):
+        """Displays an important message on the screen (centered, with a box around).
+        
+        Args:
+            message (str): message to be displayed.
+        """
 
         font = pygame.font.SysFont("Arial", 30)
-        text = font.render("The robot went off the map!", True, (0, 0, 0))
+        text = font.render(message, True, (0, 0, 0))
 
         # Calculates the x and y position to center the text
         text_rect = text.get_rect(center=(self.map.get_width()/2, self.map.get_height()/2))
