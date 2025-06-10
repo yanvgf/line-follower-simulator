@@ -278,13 +278,13 @@ class Graphics:
             pygame.draw.rect(self.map, BOX_COLOR, box, BOX_BORDER_WIDTH)
             #
             # Writes the robot positioning instructions
-            self.show_text(text="Position the robot:",
+            self.show_text(text="Place the robot:",
                         position=(20, 100), fontsize=25)
             #
             self.show_text(text=f"{heading_marker} Scroll the mouse wheel to rotate the robot.",
                         position=(40, 150), fontsize=20)
             #
-            self.show_text(text=f"{xy_marker} Left click to position the robot.",
+            self.show_text(text=f"{xy_marker} Left click to place the robot.",
                         position=(40, 190), fontsize=20)
             #
             if xy_positioned and heading_positioned:
@@ -304,7 +304,7 @@ class Graphics:
         return (robot_start_x, robot_start_y, robot_start_heading), closed
     
     def sensors_positioning(self, number_of_sensors, robot_start, closed):
-        """Positions the sensors according to the user's mouse click.
+        """Places the sensors according to the user's mouse click.
         
         Args:
             number_of_sensors (int): number of sensors (max = 10).
@@ -371,13 +371,13 @@ class Graphics:
             pygame.draw.rect(self.map, BOX_COLOR, box, BOX_BORDER_WIDTH)
             #
             # Writes the sensor positioning instructions on the screen
-            self.show_text(text="Position the sensors:",
+            self.show_text(text="Place the sensors:",
                         position=(20, 100), fontsize=25)
             #
-            self.show_text(text="Left click to position each sensor.",
+            self.show_text(text="Left click to place each sensor.",
                         position=(40, 150), fontsize=20)
             #
-            self.show_text(text=f"Positioned: {counter}/{number_of_sensors}",
+            self.show_text(text=f"Placed: {counter}/{number_of_sensors}",
                         position=(20, 190), fontsize=25)
             
             # Draws the positioned sensors at the desired position

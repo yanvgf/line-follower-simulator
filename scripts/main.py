@@ -23,7 +23,7 @@ SENSORS_POSITIONS = setup_info[7]
 SENSOR_COLORS = setup_info[8]
 
 # Initialize the map
-gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
+gfx = Graphics(MAP_DIMENSIONS, '../images/robot.png', '../images/map.png')
 
 # Initialize the robot
 robot = Robot(initial_position=ROBOT_START,

@@ -20,17 +20,9 @@ SENSOR_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
 # |                                                                     |
 # +=====================================================================+
 
-# Verify if the user wants to create a new setup file or use an existing one
-if os.path.isfile('setup.txt'):
-    print('\n\nThere is a setup.txt file already.')
-    print('Do you want to overwrite it? (y/n)')
-    answer = input()
-    while answer not in ['y', 'n']:
-        print('Invalid input. Please type \'y\' or \'n\'.')
-        answer = input()
-
-if answer == 'y':
-
+# If there is no setup.txt file, create it
+if not(os.path.isfile('setup.txt')):
+        
     # +=====================================================================+
     # |                 Map, robot and sensors positioning                  |
     # +=====================================================================+
@@ -39,7 +31,7 @@ if answer == 'y':
     pygame.init()
     infoObject = pygame.display.Info() # Get screen dimensions
     MAP_DIMENSIONS = (infoObject.current_w - 30, infoObject.current_h - 100)
-    gfx = Graphics(MAP_DIMENSIONS, 'images/robot.png', 'images/map.png')
+    gfx = Graphics(MAP_DIMENSIONS, '../images/robot.png', '../images/map.png')
 
     # Place the robot
     ROBOT_START, closed = gfx.robot_positioning()
@@ -74,3 +66,58 @@ if answer == 'y':
     else:
         # Write error exiting message on the screen
         print("\033[91m {}\033[00m" .format("\nThe setup was not completed! Exiting without saving...\n"))
+
+# If there is a setup.txt file, ask the user if he wants to overwrite it
+else: 
+    print('\n\nThere is a setup.txt file already.')
+    print('Do you want to overwrite it? (y/n)')
+    answer = input()
+    while answer not in ['y', 'n']:
+        print('Invalid input. Please type \'y\' or \'n\'.')
+        answer = input()
+
+    if answer == 'y':
+
+        # +=====================================================================+
+        # |                 Map, robot and sensors positioning                  |
+        # +=====================================================================+
+        
+        # Initialize the map
+        pygame.init()
+        infoObject = pygame.display.Info() # Get screen dimensions
+        MAP_DIMENSIONS = (infoObject.current_w - 30, infoObject.current_h - 100)
+        gfx = Graphics(MAP_DIMENSIONS, '../images/robot.png', '../images/map.png')
+
+        # Place the robot
+        ROBOT_START, closed = gfx.robot_positioning()
+
+        # Place the sensors
+        SENSORS_POSITIONS, closed = gfx.sensors_positioning(SENSORS_NUMBER, ROBOT_START, closed)
+
+        if not(closed):
+            # Write successfull exiting message on the screen
+            gfx.show_important_message("The setup is complete! Exiting and saving...")
+            pygame.display.update()
+            pygame.time.wait(1500)
+            
+            # +=====================================================================+
+            # |                        Saving the robot info                        |
+            # +=====================================================================+
+
+            setup_info = f"""{ROBOT_WIDTH}
+            {INITIAL_MOTOR_SPEED}
+            {MAX_MOTOR_SPEED}
+            {WHEEL_RADIUS} 
+            {SENSORS_NUMBER}
+            {MAP_DIMENSIONS}
+            {ROBOT_START}
+            {SENSORS_POSITIONS}
+            {SENSOR_COLORS}
+            """
+
+            # Write the setup.txt file
+            utils.write_setup_file(setup_info)
+
+        else:
+            # Write error exiting message on the screen
+            print("\033[91m {}\033[00m" .format("\nThe setup was not completed! Exiting without saving...\n"))
