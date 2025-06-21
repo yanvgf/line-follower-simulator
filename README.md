@@ -5,21 +5,24 @@ This project aims to design a straightforward simulator for a line follower robo
 
 The robot is capable of navigating along user-designed tracks utilized as maps, given that the line is distinguishable from the rest of the map, commonly by being darker. The robot's movements are governed by the user-defined control logic and sensor positioning. In the video above, the robot employs a PID control strategy to accurately trace the specified line.
 
-**Note**: This project is currently under development, and several features are yet to be implemented.
 
 ## Requirements
-To begin, install the necessary packages. The **requirements.txt** file contains all the required packages and their versions for running this project.
+The only requirements for running this simulator are:
 
-For those using conda, create a new environment using the following command (Linux or WSL):
+- Python 3.12
+- numpy==1.26.0
+- pygame==2.5.2
+
+You can install the required packages using pip:
 
 ```bash
-$ conda create --name line-follower-simulator --file requirements.txt
+pip install numpy==1.26.0 pygame==2.5.2
 ```
 
-Alternatively, you can install the packages via pip:
+If you're using conda, you can replicate my environment using the following command (Linux or WSL):
 
 ```bash
-$ pip install -r requirements.txt
+conda env create -f environment.yml
 ```
 
 ## Usage
@@ -32,10 +35,10 @@ In this file, users configure robot parameters (chassis width, wheel radius, ini
 
 ![parameters](https://github.com/yanvgf/line-follower-simulator/assets/93750334/52166420-4667-4d0d-96c8-1950de09ee16)
 
-Once the parameters are set, execute the setup.py file using the following command:
+Once the parameters are set, go to the `scripts/` folder and execute the setup.py file using the following command:
 
 ```bash
-$ python setup.py
+python setup.py
 ```
 
 A prompt will appear in the terminal asking whether the user wants to overwrite the existing setup file. To create a custom setup, users should respond with 'yes' (y).
@@ -50,10 +53,10 @@ The setup process is complete once all sensors are positioned. The robot's posit
 
 ### main.py
 
-The simulation executes based on the robot parameters and setup defined in the setup stage. To run the simulation, use the following command:
+The simulation executes based on the robot parameters and setup defined in the setup stage. To run the simulation, go to the `scripts/` folder and use the following command:
 
 ```bash
-$ python main.py
+python main.py
 ```
 
 The simulation will continue until the robot reaches the goal or until you close the window.
